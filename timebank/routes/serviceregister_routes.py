@@ -9,7 +9,6 @@ from timebank.libs.response_helpers import record_sort_params_handler, get_all_d
 
 @app.route('/api/v1/serviceregister', methods=['GET'])
 def api_get_all_service_register():
-    pass
     sort_field, sort_dir, valid = record_sort_params_handler(request.args, Serviceregister)
     if not valid:
         return '', 400
