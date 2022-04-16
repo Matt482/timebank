@@ -5,6 +5,8 @@ from sqlalchemy import inspect, text
 
 from timebank import app, db
 from timebank.models.users_model import User
+from timebank.models.services_model import Service
+from timebank.models.models_base import RegisterserviceStatusEnum
 
 
 def record_sort_params_handler(args, modeldb):
@@ -74,3 +76,27 @@ def is_number(field):
 def user_exists(field):
     if not db.session.query(User).get(field):
         raise ValidationError(field, 'User id does not exist.')
+
+
+def service_exists(field):
+    if not db.session.query(Service).get(field):
+        raise ValidationError(field, 'Service id does not exist.')
+
+
+def one_of_enum_status(field):
+    db_objs = RegisterserviceStatusEnum
+    exist = False
+    for db_obj in db_objs:
+        if db_obj.name == field:
+            exist = True
+
+    if not exist:
+        raise ValidationError(field, 'Status is not valid.')
+
+
+def is_date(field, date_format='%Y-%m-%d'):
+    if field:
+        try:
+            date = datetime.datetime.strptime(str(field), date_format).date()
+        except ValueError:
+            raise ValidationError(field, f"Incorrect data format, should be {date_format}")

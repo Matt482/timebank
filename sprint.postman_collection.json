@@ -62,39 +62,6 @@
 					"response": []
 				},
 				{
-					"name": "Service Create",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 1,\r\n    \"title\": \"Skoda ze som, skoda ze som\",\r\n    \"description\": \"iba vymyslena\",\r\n    \"service_time\": 2\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:5000/api/v1/service-create",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "5000",
-							"path": [
-								"api",
-								"v1",
-								"service-create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Service by id",
 					"request": {
 						"method": "GET",
@@ -181,6 +148,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Service Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 1,\r\n    \"title\": \"Skoda ze som, skoda ze som\",\r\n    \"description\": \"iba vymyslena\",\r\n    \"service_time\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/service-create",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"service-create"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -206,6 +206,123 @@
 								"api",
 								"v1",
 								"serviceregister"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Serviceregister by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/serviceregister/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"serviceregister",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Serviceregister by id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"note\": \"Custom note\",\r\n    \"service_id\": 1,\r\n    \"customer_id\": 1,\r\n    \"hours\": 1,\r\n    \"service_status\": \"ended\",\r\n    \"end_time\": \"2020-05-12\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/serviceregister/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"serviceregister",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Serviceregister by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/serviceregister/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"serviceregister",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Serviceregister Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"note\": \"Custom note\",\r\n    \"service_id\": 1,\r\n    \"consumer_id\": 1,\r\n    \"service_status\": \"inprogress\",\r\n    \"end_time\": \"2020-01-01\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/serviceregister-create",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"serviceregister-create"
 							]
 						}
 					},

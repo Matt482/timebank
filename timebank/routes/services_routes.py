@@ -35,47 +35,6 @@ def api_services():
         return '', 404
 
 
-@app.route('/api/v1/service-create', methods=['POST'])
-def api_single_borrow():
-    sort_field, sort_dir, valid = record_sort_params_handler(request.args, Service)
-    db_obj = Service()
-    db_objs = get_all_db_objects(sort_field, sort_dir, db.session.query(Service)).all()
-
-    req_data = None
-    if request.content_type == 'application/json':
-        req_data = request.json
-    elif request.content_type == 'application/x-www-form-urlencoded':
-        req_data = request.form
-
-    # for obj in db_objs:
-    #     if int(req_data['book_id']) == int(obj.book.id):
-    #         return 'Book is not available anymore!', 404
-    try:
-        is_number(req_data['user_id'])
-        user_exists(req_data['user_id'])
-    except ValidationError as e:
-        return e, 400
-    db_obj.user_id = int(req_data['user_id'])
-    db_obj.title = req_data['title']
-    db_obj.description = req_data['description']
-    try:
-        is_number(req_data['service_time'])
-    except ValidationError as e:
-        return e, 400
-    db_obj.service_time = req_data['service_time']
-    try:
-        # pridej zaznam do tabulky
-        db.session.add(db_obj)
-        # uloz zaznam do db
-        db.session.commit()
-        # obnov objekt z db, tak aby se zorbazili relace a id
-        db.session.refresh(db_obj)
-    except IntegrityError as e:
-        return jsonify({'error': str(e.orig)}), 405
-
-    return '', 201
-
-
 @app.route('/api/v1/service/<services_id>', methods=['GET'])
 def api_single_service_get(services_id):
     # zkontroluj, ze argument id existuje, je typu integer a je vesti nez 0
@@ -101,7 +60,8 @@ def api_single_service_get(services_id):
             phone=obj.User.phone,
             user_name=obj.User.user_name,
             time_account=obj.User.time_account,
-        )
+        ),
+        service_time=obj.service_time
     )]
 
     response = jsonify(response_obj)
@@ -137,9 +97,9 @@ def api_single_service_put(services_id):
             is_number(req_data['user_id'])
             # validuj ze uzivatel v db existuje
             user_exists(req_data['user_id'])
-        except ValidationError as e:
+        except ValidationError:
             # pokud validace neni platna, tak vrat hodnotu chyby a kod 400 - bad param
-            return e, 400
+            return '', 400
         # pokud nedojde k vyjimce, uloz do objektu db
         db_obj.user_id = int(req_data['user_id'])
 
@@ -186,3 +146,39 @@ def api_single_service_delete(services_id):
         return jsonify({'error': str(e.orig)}), 405
     else:
         return '', 204
+
+
+@app.route('/api/v1/service-create', methods=['POST'])
+def api_single_service_create():
+    db_obj = Service()
+
+    req_data = None
+    if request.content_type == 'application/json':
+        req_data = request.json
+    elif request.content_type == 'application/x-www-form-urlencoded':
+        req_data = request.form
+
+    try:
+        is_number(req_data['user_id'])
+        user_exists(req_data['user_id'])
+    except ValidationError:
+        return '', 400
+    db_obj.user_id = int(req_data['user_id'])
+    db_obj.title = req_data['title']
+    db_obj.description = req_data['description']
+    try:
+        is_number(req_data['service_time'])
+    except ValidationError:
+        return '', 400
+    db_obj.service_time = req_data['service_time']
+    try:
+        # pridej zaznam do tabulky
+        db.session.add(db_obj)
+        # uloz zaznam do db
+        db.session.commit()
+        # obnov objekt z db, tak aby se zorbazili relace a id
+        db.session.refresh(db_obj)
+    except IntegrityError as e:
+        return jsonify({'error': str(e.orig)}), 405
+
+    return '', 201
