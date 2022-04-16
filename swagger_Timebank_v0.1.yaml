@@ -1,0 +1,820 @@
+openapi: 3.0.1
+info:
+  title: Timebank
+  description: 'This is API description for Timebank project.'
+  version: 1.0.0
+servers:
+- url: http://localhost:5000/api/v1
+tags:
+- name: users
+  description: Handling users in your Timebank - User and some methods to use them.
+- name: service
+  description: Handling services in your Timebank - Service and some methods to use them.
+- name: serviceregister
+  description: Handling service register in your Timebank - Serviceregister and some methods to use them.
+  
+paths:
+  /users:
+    get:
+      security: 
+      - bearerAuth: []
+      tags:
+      - users
+      summary: Get all users
+      description: Get all users from the database
+      parameters:
+        - $ref: '#/components/parameters/sortOrderParam'
+        - $ref: '#/components/parameters/sortFieldParam'
+      responses:
+        200:
+          description: OK
+          content: {}
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /user/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of user to use
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+        security:
+        - bearerAuth: []
+        tags:
+        - users
+        summary: Find user by ID
+        description: Returns a single user
+        operationId: getUserById
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UsersWithServices'
+          400:
+            $ref: '#/components/responses/BadParam'
+          401:
+            $ref: '#/components/responses/NotAuthorized'
+          404:
+            $ref: '#/components/responses/NotFound'
+          5XX:
+            $ref: '#/components/responses/ServerError'
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+      - users
+      summary: Updates the user
+      operationId: updateUser
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserWithPasswordUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWithPasswordUpdate'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+      - users
+      summary: Delete user
+      operationId: deleteUser
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'  
+  /user-create:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - users
+      summary: Create a user in the library
+      operationId: createUser
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserWithPassword'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWithPassword'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /user/{id}/set-password:
+    parameters:
+      - name: id
+        in: path
+        description: ID of user to set
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+      - users
+      summary: Set new password to user
+      operationId: setUserPassword
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPassword'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPassword'
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /user/login:
+    post:
+      security: []
+      tags:
+        - users
+      summary: Login as user
+      operationId: userLogin
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /user/logout:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - users
+      summary: Logout user
+      operationId: userLogout
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /user/profile:
+    get:
+      security:
+      - bearerAuth: []
+      tags:
+        - users
+      summary: Get logged user details
+      operationId: userProfile
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+
+  /services:
+    get:
+      security: []
+      tags:
+      - service
+      summary: Get all services
+      description: Get all services in the Timebank
+      parameters:
+        - $ref: '#/components/parameters/sortOrderParam'
+        - $ref: '#/components/parameters/sortFieldParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  
+  /service/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of service to use
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      security: []
+      tags:
+      - service
+      summary: Find service by ID
+      operationId: getServiceById
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+      - service
+      summary: Updates a service
+      operationId: updateService
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServiceUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceUpdate'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+      - service
+      summary: Deletes a service
+      operationId: deleteService
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  
+  /service-create:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - service
+      summary: Create a service in the database
+      operationId: createService
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Service'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+
+  /serviceregister:
+    get:
+      security:
+      - bearerAuth: []
+      tags:
+        - serviceregister
+      summary: Get all services sorted and date limited (optional) from Service register
+      parameters:
+        - $ref: '#/components/parameters/sortOrderParam'
+        - $ref: '#/components/parameters/sortFieldParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRegister'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+
+  /serviceregister/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of record in service register
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+      - serviceregister
+      summary: Get record from Service register
+      description: Get details of record with associated service and consumer
+      operationId: getServiceRecord
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRegisterWithUserConsumer'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+      - serviceregister
+      summary: Update record in Service register
+      operationId: updateServiceInRegister
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServiceRegisterUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRegisterUpdate'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRegister'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+      - serviceregister
+      summary: Delete a record from Service register
+      operationId: deleteServiceRegisterRecord
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /serviceregister-create:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - serviceregister
+      summary: Create service record in Service register
+      operationId: borrowingCreate
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServiceRegister'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRegister'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRegister'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  /serviceregister/{id}/{hours}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of record in service register
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: hours
+        in: path
+        description: Number of hours needed to do service
+        required: true
+        schema:
+          type: integer
+          format: int64
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+      - serviceregister
+      summary: End of service and update record in Service register
+      operationId: EndOfServiceInRegister
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRegister'
+        400:
+          $ref: '#/components/responses/BadParam'
+        401:
+          $ref: '#/components/responses/NotAuthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        5XX:
+          $ref: '#/components/responses/ServerError'
+  
+components:
+  schemas:
+    Users:
+      required:
+        - user_name
+        - phone
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_name:
+          type: string
+          example: Janko Hrasko
+        phone:
+          type: string
+          example: +421000111222
+        time_account:
+          type: integer
+          format: int64
+          example: 1
+    UsersUpdate:
+      type: object
+      properties:
+        user_name:
+          type: string
+          example: Janko Hrasko
+        phone:
+          type: string
+          example: +421000111222
+        time_account:
+          type: integer
+          format: int64
+          example: 1
+    UsersWithServices:
+        allOf:
+          - $ref: '#/components/schemas/Users'
+          - type: object
+            properties:
+              services:
+                $ref: '#/components/schemas/Service'  
+    UserWithPassword:
+      allOf:
+        - $ref: '#/components/schemas/Users'
+        - type: object
+          properties:
+            password:
+              type: string
+              format: password
+              example: 9G(6`C2i~S]
+    UserWithPasswordUpdate:
+      allOf:
+        - $ref: '#/components/schemas/UsersUpdate'
+        - type: object
+          properties:
+            password:
+              type: string
+              format: password
+              example: janko
+    UserPassword:
+      required:
+        - password
+      type: object
+      properties:
+        password:
+          type: string
+          format: password
+          example: 9G(6`C2i~S]
+    UserLogin:
+      required:
+        - phone
+        - password
+      type: object
+      properties:
+        phone:
+          type: string
+          example: +421000111222
+        password:
+          type: string
+          format: password
+          example: kastan
+    Service:
+      required:
+        - user_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Pokosim travnik
+        description:
+          type: string
+          example: Detaily pokosenia travnika.
+        service_time:
+          type: integer
+          format: int64
+          example: 1
+    ServiceUpdate:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: Umyjem okna na mrakodrape
+        description:
+          type: string
+          example: Od 30 poschodia vyssie
+        service_time:
+          type: integer
+          format: int64
+          example: 1
+    ServiceRegister:
+      required:
+        - service_id
+        - consumer_id
+        - service_status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        note:
+          type: string
+          example: Prosim pokosit travnik v sobotu poobede.
+        service_id:
+          type: integer
+          format: int64
+          example: 1
+        consumer_id:
+          type: integer
+          format: int64
+          example: 1
+        hours:
+          type: integer
+          format: int64
+        service_status:
+          type: string
+          enum:
+            - inprogress
+            - ended
+          example: inprogress
+        end_time:
+          type: string
+          format: date
+          example: 2022-05-26 19:00:00
+    ServiceRegisterUpdate:
+      type: object
+      properties:
+        note:
+          type: string
+          example: Prosim pokosit travnik v sobotu poobede.
+        service_id:
+          type: integer
+          format: int64
+          example: 1
+        consumer_id:
+          type: integer
+          format: int64
+          example: 1
+        hours:
+          type: integer
+          format: int64
+          example: 1
+        service_status:
+          type: string
+          enum:
+            - inprogress
+            - ended
+          example: inprogress
+        end_time:
+          type: string
+          format: date
+          example: 2022-05-26 19:00:00
+    ServiceRegisterWithUserConsumer:
+        allOf:
+          - $ref: '#/components/schemas/ServiceRegister'
+          - type: object
+            properties:
+              services:
+                $ref: '#/components/schemas/Service'
+
+  parameters:
+    sortOrderParam:
+      in: query
+      name: sort
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+      description: Used to sort return values in ascending or descending order
+    sortFieldParam:
+      in: query
+      name: field
+      required: false
+      schema:
+        type: string
+      description: Used to select sorting field from the model
+    dateFromParam:
+      in: query
+      name: from
+      schema:
+        type: string
+        format: date
+        example: 2022-05-25
+      required: false
+      description: Date limiting from date listing
+    dateToParam:
+      in: query
+      name: to
+      schema:
+        type: string
+        format: date
+        example: 2022-05-25
+      required: false
+      description: Date limiting to date listing
+  responses:
+    NotFound:
+      description: No entries found.
+    NotAuthorized:
+      description: Authorization information is missing or invalid.
+    BadParam:
+      description: Bad paramters.
+    ServerError:
+      description: Unexpected response error. Server fault.
+    OperationError:
+      description: Server operation error
+      content:
+        application/json:
+          schema:
+            type: string
+    LoginResponse:
+      description: Bearer token login response
+      content:
+        application/json:
+          schema:
+            type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT Authorization header using the Bearer scheme.
+      scheme: bearer
+      bearerFormat: JWT
