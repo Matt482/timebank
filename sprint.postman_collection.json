@@ -31,6 +31,123 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "User by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/user/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User by id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\": \"0940123456\",\r\n    \"user_name\": \"Johny English\",\r\n    \"password\": \"secret\",\r\n    \"time_account\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/user/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/user/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\": \"+421900000000\",\r\n    \"password\": \"mojpassword\",\r\n    \"user_name\": \"nedam\",\r\n    \"time_account\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/v1/user-create",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"v1",
+								"user-create"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -67,7 +184,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:5000/api/v1/service/2",
+							"raw": "http://127.0.0.1:5000/api/v1/service/1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -80,7 +197,7 @@
 								"api",
 								"v1",
 								"service",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -101,7 +218,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:5000/api/v1/service/2",
+							"raw": "http://127.0.0.1:5000/api/v1/service/1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -114,7 +231,7 @@
 								"api",
 								"v1",
 								"service",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -130,7 +247,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:5000/api/v1/service/2",
+							"raw": "http://127.0.0.1:5000/api/v1/service/1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -143,7 +260,7 @@
 								"api",
 								"v1",
 								"service",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -152,19 +269,10 @@
 				{
 					"name": "Service Create",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 1,\r\n    \"title\": \"Skoda ze som, skoda ze som\",\r\n    \"description\": \"iba vymyslena\",\r\n    \"service_time\": 2\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://127.0.0.1:5000/api/v1/service-create",
+							"raw": "http://127.0.0.1:5000/api/v1/serviceregister",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -176,7 +284,7 @@
 							"path": [
 								"api",
 								"v1",
-								"service-create"
+								"serviceregister"
 							]
 						}
 					},
