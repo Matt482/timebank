@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
+from passlib.hash import pbkdf2_sha256
 
 from timebank.models.users_model import User
 from timebank import app, db
@@ -84,7 +85,8 @@ def api_single_user_put(user_id):
         db_obj.user_name = req_data['user_name']
 
     if 'password' in req_data:
-        db_obj.password = req_data['password']
+        hash_pw = pbkdf2_sha256.hash(req_data['password'])
+        db_obj.password = hash_pw
 
     if 'time_account' in req_data:
         try:
@@ -143,7 +145,8 @@ def api_single_user_create():
         req_data = request.form
 
     db_obj.phone = req_data['phone']
-    db_obj.password = req_data['password']
+    hash_pw = pbkdf2_sha256.hash(req_data['password'])
+    db_obj.password = hash_pw
     db_obj.user_name = req_data['user_name']
     try:
         is_number(req_data['time_account'])
