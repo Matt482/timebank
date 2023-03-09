@@ -78,10 +78,10 @@ def api_single_user_put(user_id):
         req_data = request.form
 
     if 'phone' in req_data:
-        db_obj.title = req_data['phone']
+        db_obj.phone = req_data['phone']
 
     if 'user_name' in req_data:
-        db_obj.title = req_data['user_name']
+        db_obj.user_name = req_data['user_name']
 
     if 'password' in req_data:
         db_obj.password = req_data['password']

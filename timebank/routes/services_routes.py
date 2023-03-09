@@ -107,7 +107,7 @@ def api_single_service_put(services_id):
         db_obj.title = req_data['title']
 
     if 'description' in req_data:
-        db_obj.title = req_data['description']
+        db_obj.description = req_data['description']
 
     if 'service_time' in req_data:
         db_obj.service_time = req_data['service_time']

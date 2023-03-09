@@ -16,9 +16,9 @@ class Config(object):
 
     DB_HOST = 'localhost'
     DB_PORT = '3306'
-    DB_NAME = "Timebank"
+    DB_NAME = "testdatabase"
     DB_USERNAME = "root"
-    DB_PASSWORD = "Bootcamp2022"
+    DB_PASSWORD = "root"
     DB_CHARSET = "utf8mb4"
 
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:" \

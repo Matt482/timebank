@@ -1,3 +1,1 @@
-id,phone,password,user_name,time_account
-1,+421905111222,,Janko Hrasko,3
-2,+421905333444,,Darth Vader,1
+id,phone,password,user_name,time_account1,+421905111222,1234,Janko Hrasko,02,+421905333444,1234,Darth Vader,03,+421905333445,1234,Jozef Kubani,04,+421955878655,1234,Lukas Medzugorie,05,+421854589656,1234,Martin Nabielom,06,+421854589876,1234,Julius Navazny,0

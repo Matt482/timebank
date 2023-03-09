@@ -42,6 +42,5 @@ import timebank.models
 import timebank.routes
 import timebank.utils
 
-
 import timebank.utils.dump_db
 import timebank.utils.fill_db

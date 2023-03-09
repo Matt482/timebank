@@ -129,7 +129,7 @@ def api_single_serviceregister_put(serviceregister_id):
             # pokud validace neni platna, tak vrat hodnotu chyby a kod 400 - bad param
             return '', 400
         # pokud nedojde k vyjimce, uloz do objektu db
-        db_obj.service_id = int(req_data['customer_id'])
+        db_obj.customer_id = int(req_data['customer_id'])
 
     if 'hours' in req_data:
         try:
@@ -139,7 +139,7 @@ def api_single_serviceregister_put(serviceregister_id):
             # pokud validace neni platna, tak vrat hodnotu chyby a kod 400 - bad param
             return '', 400
         # pokud nedojde k vyjimce, uloz do objektu db
-        db_obj.service_id = int(req_data['hours'])
+        db_obj.hours = int(req_data['hours'])
 
     if 'service_status' in req_data:
         try:
@@ -150,12 +150,13 @@ def api_single_serviceregister_put(serviceregister_id):
 
     end_time = None
     if 'end_time' in req_data and len(req_data['end_time']) > 0:
-        try:
-            is_date(req_data['end_time'])
-            end_time = datetime.datetime.strptime(str(req_data['end_time']), '%Y-%m-%d').date()
-        except ValidationError:
-            return '', 400
-        db_obj.end_time = req_data['end_time']
+        # try:
+        #     is_date(req_data['end_time'])
+        #     end_time = datetime.datetime.strptime(str(req_data['end_time']), '%Y-%m-%d').date()
+        # except ValidationError:
+        #     return '', 400
+        end_time = datetime.datetime.now()
+        db_obj.end_time = end_time
 
     try:
         # uloz do db
@@ -208,25 +209,31 @@ def api_single_serviceregister_create():
         is_number(req_data['service_id'])
         service_exists(req_data['service_id'])
     except ValidationError:
-        return '', 400
+        return 'sasasa', 400
+
     db_obj.service_id = req_data['service_id']
     try:
         is_number(req_data['consumer_id'])
         user_exists(req_data['consumer_id'])
     except ValidationError:
-        return '', 400
+        return 'bababa', 400
+
     db_obj.consumer_id = req_data['consumer_id']
     try:
         one_of_enum_status(req_data['service_status'])
     except ValidationError:
-        return '', 400
+        return 'wawawa', 400
+
     db_obj.service_status = req_data['service_status']
-    try:
-        is_date(req_data['end_time'])
-        end_time = datetime.datetime.strptime(str(req_data['end_time']), '%Y-%m-%d').date()
-    except ValidationError:
-        return '', 400
-    db_obj.end_time = req_data['end_time']
+
+    # try:
+    #     end_time = datetime.datetime.strptime(str(req_data['end_time']), '%Y-%m-%d').date()
+    #     is_date(req_data['end_time'])
+    # except ValidationError:
+    #     return 'dadada', 400
+
+    end_time = datetime.datetime.now()
+    db_obj.end_time = end_time
 
     try:
         # pridej zaznam do tabulky

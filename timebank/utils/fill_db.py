@@ -26,4 +26,3 @@ def fill_db():
             db.session.bulk_save_objects(obj_list)
             db.session.commit()
             print(f'table {modeldb.__tablename__} loaded from file {infile.name}')
-
