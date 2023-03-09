@@ -34,7 +34,8 @@ def api_get_all_service_register():
                 ),
                 hours=obj.hours,
                 service_status=obj.service_status.name,
-                end_time=obj.end_time
+                end_time=obj.end_time,
+                rating=obj.rating
             ))
 
         return jsonify(response_obj), 200
@@ -75,7 +76,8 @@ def api_single_registerservice_get(serviceregister_id):
         ),
         hours=obj.hours,
         service_status=obj.service_status.name,
-        end_time=obj.end_time
+        end_time=obj.end_time,
+        rating=obj.rating
     )]
 
     response = jsonify(response_obj)
@@ -205,20 +207,21 @@ def api_single_serviceregister_create():
         req_data = request.form
 
     db_obj.note = req_data['note']
+
     try:
         is_number(req_data['service_id'])
         service_exists(req_data['service_id'])
     except ValidationError:
         return 'sasasa', 400
-
     db_obj.service_id = req_data['service_id']
+
     try:
         is_number(req_data['consumer_id'])
         user_exists(req_data['consumer_id'])
     except ValidationError:
         return 'bababa', 400
-
     db_obj.consumer_id = req_data['consumer_id']
+
     try:
         one_of_enum_status(req_data['service_status'])
     except ValidationError:
@@ -234,6 +237,13 @@ def api_single_serviceregister_create():
 
     end_time = datetime.datetime.now()
     db_obj.end_time = end_time
+
+    #Pridaj rating na vytvorenie service registra
+    rating = req_data['rating']
+    if rating not in range(0, 6):
+        return "zazaza", 400
+    else:
+        db_obj.rating = rating
 
     try:
         # pridej zaznam do tabulky

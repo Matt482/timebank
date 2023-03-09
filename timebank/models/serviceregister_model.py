@@ -12,6 +12,7 @@ class Serviceregister(Base):
     hours = Column(Integer())
     service_status = Column(Enum(RegisterserviceStatusEnum), nullable=False)
     end_time = Column(Date())
+    rating = Column(Integer(), nullable=True)
 
     User = relationship("User", order_by="User.id", back_populates="Serviceregister", cascade="all")
     Service = relationship("Service", order_by="Service.id", back_populates="Serviceregister", cascade="all")
