@@ -1,5 +1,5 @@
 from timebank.models.models_base import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
 from sqlalchemy.orm import relationship
 
 
@@ -10,6 +10,7 @@ class Service(Base):
     description = Column(String(500), nullable=False)
     user_id = Column(Integer(), ForeignKey('User.id'), nullable=False)
     service_time = Column(Integer(), nullable=False)
+    avg_rating = Column(Float(), nullable=True)
 
     User = relationship("User", order_by="User.id", back_populates="Service", cascade="all")
     Serviceregister = relationship("Serviceregister", order_by="Serviceregister.id",

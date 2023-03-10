@@ -1,2 +1,1 @@
-id,title,description,user_id,service_time
-1,Pokosim travnik,Pokosim travnik o minimalnej rozlohe 300 m2. Len cez vikend.,1,2
+id,title,description,user_id,service_time,avg_rating1,Pokosim travnik,Pokosim travnik o minimalnej rozlohe 300 m2. Len cez vikend.,1,2,0.5

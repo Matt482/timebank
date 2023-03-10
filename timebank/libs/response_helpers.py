@@ -100,3 +100,15 @@ def is_date(field, date_format='%Y-%m-%d'):
             date = datetime.datetime.strptime(str(field), date_format).date()
         except ValueError:
             raise ValidationError(field, f"Incorrect data format, should be {date_format}")
+
+
+def calc_avg_rat(model, reg_id):
+    serv_count = 0
+    avg_rat = 0
+    for x in model:
+        if x.Service.id == int(reg_id):
+            avg_rat += x.rating
+            serv_count += 1
+
+    final_rat = round(avg_rat/serv_count, 1)
+    return final_rat

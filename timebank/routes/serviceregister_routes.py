@@ -2,9 +2,10 @@ import datetime
 from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
 from timebank.models.serviceregister_model import Serviceregister
+from timebank.models.services_model import Service
 from timebank import app, db
 from timebank.libs.response_helpers import record_sort_params_handler, get_all_db_objects, is_number, ValidationError, \
-    user_exists, service_exists, one_of_enum_status, is_date
+    user_exists, service_exists, one_of_enum_status, is_date, calc_avg_rat
 
 
 @app.route('/api/v1/serviceregister', methods=['GET'])
@@ -25,6 +26,7 @@ def api_get_all_service_register():
                     title=obj.Service.title,
                     description=obj.Service.description,
                     service_time=obj.Service.service_time,
+                    avg_rating=obj.Service.avg_rating
                 ),
                 User=dict(
                     id=obj.User.id,
@@ -67,6 +69,7 @@ def api_single_registerservice_get(serviceregister_id):
             title=obj.Service.title,
             description=obj.Service.description,
             service_time=obj.Service.service_time,
+            avg_rating=obj.Service.avg_rating
         ),
         User=dict(
             id=obj.User.id,
@@ -256,3 +259,51 @@ def api_single_serviceregister_create():
         return jsonify({'error': str(e.orig)}), 405
 
     return '', 201
+
+
+@app.route('/api/v1/rating/<serviceregister_id>', methods=['GET'])
+def get_avg_rating(serviceregister_id):
+    db_query = db.session.query(Serviceregister)
+    obj = db_query.get(serviceregister_id)
+
+    final_rat = calc_avg_rat(db_query, serviceregister_id)
+
+    response_obj = [dict(
+        id=obj.id,
+        Service=dict(
+            id=obj.Service.id,
+            avg_rating=final_rat
+        ),
+        rating=obj.rating
+    )]
+
+    response = jsonify(response_obj)
+    return response, 200
+
+
+
+# """
+# @app.route('/api/v1/rating/<serviceregister_id>', methods=['GET'])
+# def get_avg_rating(serviceregister_id):
+#     db_query = db.session.query(Serviceregister)
+#     obj = db_query.get(serviceregister_id)
+#
+#     serv_count = 0
+#     avg_rat = 0
+#     for x in db_query:
+#         if x.Service.id == int(serviceregister_id):
+#             avg_rat += x.rating
+#             serv_count += 1
+#
+#     final_rat = round(avg_rat/serv_count, 1)
+#     response_obj = [dict(
+#         id=obj.id,
+#         Service=dict(
+#             id=obj.Service.id,
+#             avg_rating=final_rat
+#         ),
+#         rating=obj.rating
+#     )]
+#
+#     response = jsonify(response_obj)
+#     return response, 200"""

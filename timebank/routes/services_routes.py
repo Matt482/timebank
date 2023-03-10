@@ -2,6 +2,7 @@ from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
 
 from timebank.models.services_model import Service
+from timebank.models.serviceregister_model import Serviceregister
 from timebank import app, db
 from timebank.libs.response_helpers import record_sort_params_handler, get_all_db_objects, is_number, ValidationError, \
     user_exists
@@ -27,7 +28,8 @@ def api_services():
                     user_name=obj.User.user_name,
                     time_account=obj.User.time_account,
                 ),
-                service_time=obj.service_time
+                service_time=obj.service_time,
+                avg_rating=obj.avg_rating
             ))
 
         return jsonify(response_obj), 200
@@ -61,7 +63,8 @@ def api_single_service_get(services_id):
             user_name=obj.User.user_name,
             time_account=obj.User.time_account,
         ),
-        service_time=obj.service_time
+        service_time=obj.service_time,
+        avg_rating=obj.avg_rating
     )]
 
     response = jsonify(response_obj)
@@ -150,7 +153,8 @@ def api_single_service_delete(services_id):
 
 @app.route('/api/v1/service-create', methods=['POST'])
 def api_single_service_create():
-    db_obj = Service()
+    serv_db_obj = Service()
+    # serv_reg_db_obj = Serviceregister()
 
     req_data = None
     if request.content_type == 'application/json':
@@ -163,21 +167,21 @@ def api_single_service_create():
         user_exists(req_data['user_id'])
     except ValidationError:
         return '', 400
-    db_obj.user_id = int(req_data['user_id'])
-    db_obj.title = req_data['title']
-    db_obj.description = req_data['description']
+    serv_db_obj.user_id = int(req_data['user_id'])
+    serv_db_obj.title = req_data['title']
+    serv_db_obj.description = req_data['description']
     try:
         is_number(req_data['service_time'])
     except ValidationError:
         return '', 400
-    db_obj.service_time = req_data['service_time']
+    serv_db_obj.service_time = req_data['service_time']
     try:
         # pridej zaznam do tabulky
-        db.session.add(db_obj)
+        db.session.add(serv_db_obj)
         # uloz zaznam do db
         db.session.commit()
         # obnov objekt z db, tak aby se zorbazili relace a id
-        db.session.refresh(db_obj)
+        db.session.refresh(serv_db_obj)
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
 
