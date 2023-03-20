@@ -178,25 +178,56 @@ def api_single_serviceregister_put(serviceregister_id):
 @app.route('/api/v1/serviceregister/<serviceregister_id>', methods=['DELETE'])
 def api_single_registerservice_delete(serviceregister_id):
 
-    if not serviceregister_id and type(serviceregister_id) is int and 0 < serviceregister_id:
-        return '', 400
+    # if not serviceregister_id and type(serviceregister_id) is int and 0 < serviceregister_id:
+    #     return '', 400
 
     # nacti z db konkretni zaznam
     db_query = db.session.query(Serviceregister)
-    db_obj = db_query.filter_by(id=serviceregister_id)
+    db_obj_del = db_query.filter_by(id=serviceregister_id)
+    db_obj = db_query.get(serviceregister_id)
+    servis_reg_id = db_obj.service_id
+    print(servis_reg_id)
 
     if not db_obj:
         return '', 404
 
     try:
         # smaz zaznam
-        db_obj.delete()
+        db_obj_del.delete()
         # uloz operaci do db
         db.session.commit()
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
-    else:
-        return '', 204
+
+    #LETS CALC AVG RATING OF SERVICE!!!!!!!!!!!!!!!!!!!!
+    print("IDEME RATAT AVG RATING!!!!")
+    #calc rating by func!!!
+    objec = db.session.query(Serviceregister)
+    serv_count = 0
+    avg_rat = 0
+    print('ideme iterovat!')
+    for x in objec:
+
+        if x.service_id == int(servis_reg_id):
+            print("BINGO MAME TA!!!")
+            avg_rat += x.rating
+            serv_count += 1
+    try:
+        final_rat = round(avg_rat / serv_count, 1)
+
+    except ZeroDivisionError as ze:
+        raise ze
+
+    db_query = db.session.query(Service)
+    obj = db_query.get(servis_reg_id)
+    print("avg rating is: ", obj.avg_rating)
+
+    print("avg final rat is: ", final_rat)
+    obj.avg_rating = final_rat
+    print("avg final rat for our object is: ", obj.avg_rating)
+    db.session.commit()
+
+    return '', 204
 
 
 @app.route('/api/v1/serviceregister-create', methods=['POST'])
@@ -232,12 +263,6 @@ def api_single_serviceregister_create():
 
     db_obj.service_status = req_data['service_status']
 
-    # try:
-    #     end_time = datetime.datetime.strptime(str(req_data['end_time']), '%Y-%m-%d').date()
-    #     is_date(req_data['end_time'])
-    # except ValidationError:
-    #     return 'dadada', 400
-
     end_time = datetime.datetime.now()
     db_obj.end_time = end_time
 
@@ -258,52 +283,27 @@ def api_single_serviceregister_create():
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
 
-    return '', 201
+    #####################################################################################
+    print("IDEME RATAT AVG RATING!!!!")
+    serv_id = req_data['service_id']
+    db_query = db.session.query(Service)
+    obj = db_query.get(serv_id)
 
+    #calc rating by func!!!
+    objec = db.session.query(Serviceregister)
+    serv_count = 0
+    avg_rat = 0
+    for x in objec:
+        if x.service_id == int(serv_id):
+            avg_rat += x.rating
+            serv_count += 1
+    try:
+        final_rat = round(avg_rat / serv_count, 1)
+    except ZeroDivisionError as ze:
+        raise ze
 
-@app.route('/api/v1/rating/<serviceregister_id>', methods=['GET'])
-def get_avg_rating(serviceregister_id):
-    db_query = db.session.query(Serviceregister)
-    obj = db_query.get(serviceregister_id)
-
-    final_rat = calc_avg_rat(db_query, serviceregister_id)
-
-    response_obj = [dict(
-        id=obj.id,
-        Service=dict(
-            id=obj.Service.id,
-            avg_rating=final_rat
-        ),
-        rating=obj.rating
-    )]
-
-    response = jsonify(response_obj)
-    return response, 200
-
-
-
-# """
-# @app.route('/api/v1/rating/<serviceregister_id>', methods=['GET'])
-# def get_avg_rating(serviceregister_id):
-#     db_query = db.session.query(Serviceregister)
-#     obj = db_query.get(serviceregister_id)
-#
-#     serv_count = 0
-#     avg_rat = 0
-#     for x in db_query:
-#         if x.Service.id == int(serviceregister_id):
-#             avg_rat += x.rating
-#             serv_count += 1
-#
-#     final_rat = round(avg_rat/serv_count, 1)
-#     response_obj = [dict(
-#         id=obj.id,
-#         Service=dict(
-#             id=obj.Service.id,
-#             avg_rating=final_rat
-#         ),
-#         rating=obj.rating
-#     )]
-#
-#     response = jsonify(response_obj)
-#     return response, 200"""
+    obj.avg_rating = final_rat
+    db.session.commit()
+    db.session.refresh(obj)
+    print(obj.avg_rating)
+    return "", 200

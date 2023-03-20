@@ -5,7 +5,7 @@ from timebank.models.services_model import Service
 from timebank.models.serviceregister_model import Serviceregister
 from timebank import app, db
 from timebank.libs.response_helpers import record_sort_params_handler, get_all_db_objects, is_number, ValidationError, \
-    user_exists
+    user_exists, calc_avg_rat
 
 
 @app.route('/api/v1/services', methods=['GET'])
@@ -186,3 +186,24 @@ def api_single_service_create():
         return jsonify({'error': str(e.orig)}), 405
 
     return '', 201
+
+
+@app.route('/api/v1/trying/<serviceregister_id>', methods=['GET'])
+def get_avg_rat(serviceregister_id):
+
+    obj = db.session.query(Serviceregister)
+    serv_count = 0
+    avg_rat = 0
+    for x in obj:
+        if x.service_id == int(serviceregister_id):
+            avg_rat += x.rating
+            serv_count += 1
+    try:
+        final_rat = round(avg_rat / serv_count, 1)
+    except ZeroDivisionError as ze:
+        raise ze
+
+    serv = db.session.query(Service).where(Service.id == obj.service_id)
+    serv.avg_rating = final_rat
+    db.session.commit()
+    return "", 200
