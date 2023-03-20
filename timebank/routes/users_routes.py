@@ -31,20 +31,19 @@ def api_users():
 
 @app.route('/api/v1/user/<user_id>', methods=['GET'])
 def api_single_user_get(user_id):
-    # zkontroluj, ze argument id existuje, je typu integer a je vesti nez 0
+    # check that argument id exists is int type and bigger than 0
     if not user_id and type(user_id) is int and 0 < user_id:
-        # vrat prazdny retezec s chybou 400 - bad params
+        # return empty array with error 400 - bad params
         return '', 400
 
-    # vrat z databaze konkretni objekt identifikovany pomoci id zaznamu
+    # return from db specific object identified via id
     db_query = db.session.query(User)
     obj = db_query.get(user_id)
 
     if not obj:
-        # pokud nebyl objekt nalezen, vrat prazdny retezec a kod 404 - record not found
+        # if not obj found return empty array with error 404 - record not found
         return '', 404
 
-    # dopocitej delku vypujcky z data vzniku zaznamu a predpokladaneho data vraceni
     response_obj = [dict(
         id=obj.id,
         phone=obj.phone,
@@ -59,19 +58,19 @@ def api_single_user_get(user_id):
 @app.route('/api/v1/user/<user_id>', methods=['PUT'])
 def api_single_user_put(user_id):
 
-    # zkontroluj validitu id
+    # check id validation
     if not user_id and type(user_id) is int and 0 < user_id:
         return '', 400
 
-    # nacti puvodni objekt z db
+    # load obj from db
     db_query = db.session.query(User)
     db_obj = db_query.get(user_id)
 
     if not db_obj:
         return '', 404
 
-    # zjisti zda byl request proveden pomoci weboveho formulare nebo s daty ve formatu json
-    # v ruzny pripadech flask zpristupnuje prijata data v ruznych objektech requestu
+    # check if request was made via web form or via data in json format
+    # in diff scenarios flask makes available coming data in diff obj request
     req_data = None
     if request.content_type == 'application/json':
         req_data = request.json
@@ -90,21 +89,21 @@ def api_single_user_put(user_id):
 
     if 'time_account' in req_data:
         try:
-            # validuj ze hodnota je number
+            # valid if value is a number
             is_number(req_data['time_account'])
         except ValidationError:
-            # pokud validace neni platna, tak vrat hodnotu chyby a kod 400 - bad param
+            # if not valid return 400 - bad param
             return '', 400
-        # pokud nedojde k vyjimce, uloz do objektu db
+        # if no except save to obj in db
         db_obj.time_account = int(req_data['time_account'])
 
     try:
-        # uloz do db
+        # save to db
         db.session.commit()
-        # aktualizuj nacteny objekt z db podle aktualniho platneho stavu
+        # update loaded obj from db according actual valid state
         db.session.refresh(db_obj)
     except IntegrityError as e:
-        # pokud dojde k vyjimce pri ukladani do db, pak vrat chybu 405 - not allowed
+        # if exception occurs in saving to db return 405 - not allowed
         return jsonify({'error': str(e.orig)}), 405
 
     return '', 204
@@ -116,7 +115,7 @@ def api_single_user_delete(user_id):
     if not user_id and type(user_id) is int and 0 < user_id:
         return '', 400
 
-    # nacti z db konkretni zaznam
+    # load record from db
     db_query = db.session.query(User)
     db_obj = db_query.filter_by(id=user_id)
 
@@ -124,9 +123,9 @@ def api_single_user_delete(user_id):
         return '', 404
 
     try:
-        # smaz zaznam
+        # delete record
         db_obj.delete()
-        # uloz operaci do db
+        # save operation to db
         db.session.commit()
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
@@ -154,11 +153,11 @@ def api_single_user_create():
         return '', 400
     db_obj.time_account = req_data['time_account']
     try:
-        # pridej zaznam do tabulky
+        # add record to db
         db.session.add(db_obj)
-        # uloz zaznam do db
+        # save record to db
         db.session.commit()
-        # obnov objekt z db, tak aby se zorbazili relace a id
+        # renewal obj from db, so it show relation and id
         db.session.refresh(db_obj)
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405

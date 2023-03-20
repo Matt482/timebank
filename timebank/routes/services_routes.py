@@ -39,20 +39,19 @@ def api_services():
 
 @app.route('/api/v1/service/<services_id>', methods=['GET'])
 def api_single_service_get(services_id):
-    # zkontroluj, ze argument id existuje, je typu integer a je vesti nez 0
+    # check that argument id exists is int type and bigger than 0
     if not services_id and type(services_id) is int and 0 < services_id:
-        # vrat prazdny retezec s chybou 400 - bad params
+        # return empty array with error 400 - bad params
         return '', 400
 
-    # vrat z databaze konkretni objekt identifikovany pomoci id zaznamu
+    # return from db specific object identified via id
     db_query = db.session.query(Service)
     obj = db_query.get(services_id)
 
     if not obj:
-        # pokud nebyl objekt nalezen, vrat prazdny retezec a kod 404 - record not found
+        # if not obj found return empty array with error 404 - record not found
         return '', 404
 
-    # dopocitej delku vypujcky z data vzniku zaznamu a predpokladaneho data vraceni
     response_obj = [dict(
         id=obj.id,
         title=obj.title,
@@ -74,36 +73,34 @@ def api_single_service_get(services_id):
 @app.route('/api/v1/service/<services_id>', methods=['PUT'])
 def api_single_service_put(services_id):
 
-    # zkontroluj validitu id
+    # check id validation
     if not services_id and type(services_id) is int and 0 < services_id:
         return '', 400
 
-    # nacti puvodni objekt z db
+    # load obj from db
     db_query = db.session.query(Service)
     db_obj = db_query.get(services_id)
 
     if not db_obj:
         return '', 404
 
-    # zjisti zda byl request proveden pomoci weboveho formulare nebo s daty ve formatu json
-    # v ruzny pripadech flask zpristupnuje prijata data v ruznych objektech requestu
+    # check if request was made via web form or via data in json format
+    # in diff scenarios flask makes available coming data in diff obj request
     req_data = None
     if request.content_type == 'application/json':
         req_data = request.json
     elif request.content_type == 'application/x-www-form-urlencoded':
         req_data = request.form
 
-    # zpracuje pole user_id, pokud je zadane, tak zmen hodnotu
+    # will process field user_id, if entered, change value
     if 'user_id' in req_data:
         try:
-            # validuj ze hodnota je number
             is_number(req_data['user_id'])
-            # validuj ze uzivatel v db existuje
+            # valid if user exists in db
             user_exists(req_data['user_id'])
         except ValidationError:
-            # pokud validace neni platna, tak vrat hodnotu chyby a kod 400 - bad param
+            # if validation not valid than return error with code 400 - bad param
             return '', 400
-        # pokud nedojde k vyjimce, uloz do objektu db
         db_obj.user_id = int(req_data['user_id'])
 
     if 'title' in req_data:
@@ -116,12 +113,12 @@ def api_single_service_put(services_id):
         db_obj.service_time = req_data['service_time']
 
     try:
-        # uloz do db
+        # save to db
         db.session.commit()
-        # aktualizuj nacteny objekt z db podle aktualniho platneho stavu
+        # renewal obj from db, so it show relation and id
         db.session.refresh(db_obj)
     except IntegrityError as e:
-        # pokud dojde k vyjimce pri ukladani do db, pak vrat chybu 405 - not allowed
+        # if exception occurs in saving to db return 405 - not allowed
         return jsonify({'error': str(e.orig)}), 405
 
     return '', 204
@@ -133,7 +130,6 @@ def api_single_service_delete(services_id):
     if not services_id and type(services_id) is int and 0 < services_id:
         return '', 400
 
-    # nacti z db konkretni zaznam
     db_query = db.session.query(Service)
     db_obj = db_query.filter_by(id=services_id)
 
@@ -141,9 +137,7 @@ def api_single_service_delete(services_id):
         return '', 404
 
     try:
-        # smaz zaznam
         db_obj.delete()
-        # uloz operaci do db
         db.session.commit()
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
@@ -154,7 +148,6 @@ def api_single_service_delete(services_id):
 @app.route('/api/v1/service-create', methods=['POST'])
 def api_single_service_create():
     serv_db_obj = Service()
-    # serv_reg_db_obj = Serviceregister()
 
     req_data = None
     if request.content_type == 'application/json':
@@ -176,11 +169,8 @@ def api_single_service_create():
         return '', 400
     serv_db_obj.service_time = req_data['service_time']
     try:
-        # pridej zaznam do tabulky
         db.session.add(serv_db_obj)
-        # uloz zaznam do db
         db.session.commit()
-        # obnov objekt z db, tak aby se zorbazili relace a id
         db.session.refresh(serv_db_obj)
     except IntegrityError as e:
         return jsonify({'error': str(e.orig)}), 405
